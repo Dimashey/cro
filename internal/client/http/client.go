@@ -1,22 +1,24 @@
 package http
 
-import "fmt"
 import "strings"
 import "net/http" 
+import "errors"
 
 type client struct {
 	baseUrl string
 	http    *http.Client
 }
 
-func New(baseURL string) *client {
+var InvalidUrl = errors.New("Invalid URL")
+
+func New(baseURL string) (*client, error) {
 	isValid := isValidUrl(baseURL)
 
 	if !isValid {
-		panic(fmt.Sprintf("invalid url was provided: %s\n", baseURL))
+		return nil, InvalidUrl
 	}
 
-	return &client{baseUrl: strings.TrimSuffix(baseURL, "/"), http: &http.Client{}}
+	return &client{baseUrl: strings.TrimSuffix(baseURL, "/"), http: &http.Client{}}, nil
 }
 
 func (c client) Get(endpoint string) (*http.Response, error) {
