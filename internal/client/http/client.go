@@ -4,24 +4,24 @@ import "strings"
 import "net/http" 
 import "errors"
 
-type client struct {
+type Client struct {
 	baseUrl string
 	http    *http.Client
 }
 
 var InvalidUrl = errors.New("Invalid URL")
 
-func New(baseURL string) (*client, error) {
+func New(baseURL string) (*Client, error) {
 	isValid := isValidUrl(baseURL)
 
 	if !isValid {
 		return nil, InvalidUrl
 	}
 
-	return &client{baseUrl: strings.TrimSuffix(baseURL, "/"), http: &http.Client{}}, nil
+	return &Client{baseUrl: strings.TrimSuffix(baseURL, "/"), http: &http.Client{}}, nil
 }
 
-func (c client) Get(endpoint string) (*http.Response, error) {
+func (c Client) Get(endpoint string) (*http.Response, error) {
 	path := c.path(endpoint)
 
 	req, err := http.NewRequest("GET", path, nil)
@@ -40,7 +40,7 @@ func (c client) Get(endpoint string) (*http.Response, error) {
 }
 
 
-func (c client) path(endpoint string) string {
+func (c Client) path(endpoint string) string {
 	path := c.baseUrl + "/" + strings.TrimPrefix(endpoint, "/")
 
 	return path
