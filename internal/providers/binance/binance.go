@@ -16,7 +16,7 @@ func New() *binance {
 }
 
 func (b binance) Ticker() (BinanceTickerListResponse, error) {
-	resp, err := b.client.Get("/ticker/24hr")
+	resp, err := b.client.Get("/ticker/24hr", nil)
 
 	if err != nil {
 		return nil, err
@@ -29,6 +29,26 @@ func (b binance) Ticker() (BinanceTickerListResponse, error) {
 
 	if err != nil {
 		return nil, err
+	}
+
+	return ticker, nil
+}
+
+
+func (b binance) PairTicker(pair string) (BinanceTickerPair, error) {
+	resp, err := b.client.Get("/ticker/24hr", map[string]string{"symbol": pair})
+
+	if err != nil {
+		return BinanceTickerPair{}, err
+	}
+
+	defer resp.Body.Close()
+
+	var ticker BinanceTickerPair
+	err = json.NewDecoder(resp.Body).Decode(&ticker)
+
+	if err != nil {
+		return BinanceTickerPair{}, err
 	}
 
 	return ticker, nil

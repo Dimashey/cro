@@ -21,13 +21,23 @@ func New(baseURL string) (*Client, error) {
 	return &Client{baseUrl: strings.TrimSuffix(baseURL, "/"), http: &http.Client{}}, nil
 }
 
-func (c Client) Get(endpoint string) (*http.Response, error) {
+func (c Client) Get(endpoint string, query map[string]string) (*http.Response, error) {
 	path := c.path(endpoint)
 
 	req, err := http.NewRequest("GET", path, nil)
 
 	if err != nil {
 		return nil, err
+	}
+
+	if query != nil {
+		q := req.URL.Query()
+
+		for key, value := range query {
+			q.Add(key, value)
+		}
+
+		req.URL.RawQuery = q.Encode()
 	}
 
 	resp, err := c.http.Do(req)
