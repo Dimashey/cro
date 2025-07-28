@@ -7,3 +7,5 @@ type BinanceTickerPair struct {
 }
 
 type BinanceTickerListResponse []BinanceTickerPair
+
+type BinanceCandlestickResponse []BinanceCandlestick

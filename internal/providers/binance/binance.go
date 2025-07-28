@@ -1,9 +1,12 @@
 package binance
 
-import "encoding/json"
-import "github.com/Dimashey/cro/internal/client/http"
+import (
+	"encoding/json"
 
-type binance struct{
+	"github.com/Dimashey/cro/internal/client/http"
+)
+
+type binance struct {
 	client *http.Client
 }
 
@@ -17,7 +20,6 @@ func New() *binance {
 
 func (b binance) Ticker() (BinanceTickerListResponse, error) {
 	resp, err := b.client.Get("/ticker/24hr", nil)
-
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +28,6 @@ func (b binance) Ticker() (BinanceTickerListResponse, error) {
 
 	var ticker BinanceTickerListResponse
 	err = json.NewDecoder(resp.Body).Decode(&ticker)
-
 	if err != nil {
 		return nil, err
 	}
@@ -34,10 +35,8 @@ func (b binance) Ticker() (BinanceTickerListResponse, error) {
 	return ticker, nil
 }
 
-
 func (b binance) PairTicker(pair string) (BinanceTickerPair, error) {
 	resp, err := b.client.Get("/ticker/24hr", map[string]string{"symbol": pair})
-
 	if err != nil {
 		return BinanceTickerPair{}, err
 	}
@@ -46,10 +45,26 @@ func (b binance) PairTicker(pair string) (BinanceTickerPair, error) {
 
 	var ticker BinanceTickerPair
 	err = json.NewDecoder(resp.Body).Decode(&ticker)
-
 	if err != nil {
 		return BinanceTickerPair{}, err
 	}
 
 	return ticker, nil
+}
+
+func (b binance) Candlesticks(options map[string]string) (BinanceCandlestickResponse, error) {
+	resp, err := b.client.Get("/klines", options)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	var candlesticks BinanceCandlestickResponse
+	
+	if err := json.NewDecoder(resp.Body).Decode(&candlesticks); err != nil {
+		return nil, err
+	}
+
+	return candlesticks, nil
 }
